@@ -106,6 +106,14 @@ public class TimeUtil {
 
     protected final static Method systemNanoTimeMethod;
 
+    // db precision 에 맞추기 이전에 vcnc 레포에서 원하는 nanos precision
+    public static final int defaultNanosPrecision = 6;
+
+    // java에서 common 으로 사용되는 nanos precision.
+    public static final int commonNanosPrecision = 9;
+
+    public static final int commonMaxNanos = (int) Math.pow(10, commonNanosPrecision);
+
     static {
         Method aMethod;
 
@@ -180,6 +188,16 @@ public class TimeUtil {
     }
 
     /**
+     * java 에서 common으로 사용되는 nanos precision을 우리가 원하는 자리수만 사용하기 위함
+     * @param nanos original nanos
+     * @return 기존에 정의한 자리수만 남은 nanos
+     */
+    private static int getPrecisedNanos(int nanos) {
+        int tail = (int) Math.pow(10, commonNanosPrecision - defaultNanosPrecision);
+        return nanos - (nanos % tail);
+    }
+
+    /**
      * Return a new Timestamp object which value is adjusted according to known DATE, DATETIME or TIMESTAMP field precision.
      * 
      * @param ts
@@ -197,10 +215,11 @@ public class TimeUtil {
             throw ExceptionFactory.createException(WrongArgumentException.class, "fsp value must be in 0 to 6 range.");
         }
         Timestamp res = (Timestamp) ts.clone();
-        double tail = Math.pow(10, 9 - fsp);
-        int nanos = serverRoundFracSecs ? (int) Math.round(res.getNanos() / tail) * (int) tail : (int) (res.getNanos() / tail) * (int) tail;
-        if (nanos > 999999999) { // if rounded up to the second then increment seconds
-            nanos %= 1000000000; // get last 9 digits
+        int precisedNanos = getPrecisedNanos(res.getNanos());
+        double tail = Math.pow(10, commonNanosPrecision - fsp);
+        int nanos = serverRoundFracSecs ? (int) Math.round(precisedNanos / tail) * (int) tail : (int) (precisedNanos / tail) * (int) tail;
+        if (nanos >= commonMaxNanos) { // if rounded up to the second then increment seconds
+            nanos %= commonMaxNanos; // get last 9 digits
             res.setTime(res.getTime() + 1000); // increment seconds
         }
         res.setNanos(nanos);
@@ -224,12 +243,12 @@ public class TimeUtil {
         if (fsp < 0 || fsp > 6) {
             throw ExceptionFactory.createException(WrongArgumentException.class, "fsp value must be in 0 to 6 range.");
         }
-        int originalNano = x.getNano();
-        double tail = Math.pow(10, 9 - fsp);
+        int precisedNanos = getPrecisedNanos(x.getNano());
+        double tail = Math.pow(10, commonNanosPrecision - fsp);
 
-        int adjustedNano = serverRoundFracSecs ? (int) Math.round(originalNano / tail) * (int) tail : (int) (originalNano / tail) * (int) tail;
-        if (adjustedNano > 999999999) { // if rounded up to the second then increment seconds
-            adjustedNano %= 1000000000;
+        int adjustedNano = serverRoundFracSecs ? (int) Math.round(precisedNanos / tail) * (int) tail : (int) (precisedNanos / tail) * (int) tail;
+        if (adjustedNano >= commonMaxNanos) { // if rounded up to the second then increment seconds
+            adjustedNano %= commonMaxNanos;
             x = x.plusSeconds(1);
         }
         return x.withNano(adjustedNano);
@@ -239,12 +258,12 @@ public class TimeUtil {
         if (fsp < 0 || fsp > 6) {
             throw ExceptionFactory.createException(WrongArgumentException.class, "fsp value must be in 0 to 6 range.");
         }
-        int originalNano = x.getNano();
-        double tail = Math.pow(10, 9 - fsp);
+        int precisedNanos = getPrecisedNanos(x.getNano());
+        double tail = Math.pow(10, commonNanosPrecision - fsp);
 
-        int adjustedNano = serverRoundFracSecs ? (int) Math.round(originalNano / tail) * (int) tail : (int) (originalNano / tail) * (int) tail;
-        if (adjustedNano > 999999999) { // if rounded up to the second then increment seconds
-            adjustedNano %= 1000000000;
+        int adjustedNano = serverRoundFracSecs ? (int) Math.round(precisedNanos / tail) * (int) tail : (int) (precisedNanos / tail) * (int) tail;
+        if (adjustedNano >= commonMaxNanos) { // if rounded up to the second then increment seconds
+            adjustedNano %= commonMaxNanos;
             x = x.plusSeconds(1);
         }
         return x.withNano(adjustedNano);
@@ -254,12 +273,12 @@ public class TimeUtil {
         if (fsp < 0 || fsp > 6) {
             throw ExceptionFactory.createException(WrongArgumentException.class, "fsp value must be in 0 to 6 range.");
         }
-        int originalNano = x.getNano();
-        double tail = Math.pow(10, 9 - fsp);
+        int precisedNanos = getPrecisedNanos(x.getNano());
+        double tail = Math.pow(10, commonNanosPrecision - fsp);
 
-        int adjustedNano = serverRoundFracSecs ? (int) Math.round(originalNano / tail) * (int) tail : (int) (originalNano / tail) * (int) tail;
-        if (adjustedNano > 999999999) { // if rounded up to the second then increment seconds
-            adjustedNano %= 1000000000;
+        int adjustedNano = serverRoundFracSecs ? (int) Math.round(precisedNanos / tail) * (int) tail : (int) (precisedNanos / tail) * (int) tail;
+        if (adjustedNano >= commonMaxNanos) { // if rounded up to the second then increment seconds
+            adjustedNano %= commonMaxNanos;
             x = x.plusSeconds(1);
         }
         return x.withNanos(adjustedNano);

@@ -52,6 +52,8 @@ public class TimeUtilTest {
     @Test
     public void testAdjustTimestampNanosPrecision() {
         assertTrue(Timestamp.valueOf("2020-02-26 14:30:11").equals(TimeUtil.adjustNanosPrecision(Timestamp.valueOf("2020-02-26 14:30:10.999999999"), 3, true)));
+        // 6자리를 먼저 자른 뒤, 6자리로 보정하면 그대로 나온다
+        assertTrue(Timestamp.valueOf("2020-02-26 14:30:10.999999").equals(TimeUtil.adjustNanosPrecision(Timestamp.valueOf("2020-02-26 14:30:10.999999999"), 6, true)));
         assertTrue(Timestamp.valueOf("2020-02-26 14:30:10.999")
                 .equals(TimeUtil.adjustNanosPrecision(Timestamp.valueOf("2020-02-26 14:30:10.999999999"), 3, false)));
         assertTrue(Timestamp.valueOf("2020-02-26 14:30:10.778")
@@ -61,6 +63,9 @@ public class TimeUtilTest {
 
         assertTrue(LocalDateTime.of(2020, 02, 26, 14, 30, 11)
                 .equals(TimeUtil.adjustNanosPrecision(LocalDateTime.of(2020, 02, 26, 14, 30, 10, 999999999), 3, true)));
+        // 6자리를 먼저 자른 뒤, 6자리로 보정하면 그대로 나온다
+        assertTrue(LocalDateTime.of(2020, 02, 26, 14, 30, 10, 999999000)
+                .equals(TimeUtil.adjustNanosPrecision(LocalDateTime.of(2020, 02, 26, 14, 30, 10, 999999999), 6, true)));
         assertTrue(LocalDateTime.of(2020, 02, 26, 14, 30, 10, 999000000)
                 .equals(TimeUtil.adjustNanosPrecision(LocalDateTime.of(2020, 02, 26, 14, 30, 10, 999999999), 3, false)));
         assertTrue(LocalDateTime.of(2020, 02, 26, 14, 30, 10, 778000000)

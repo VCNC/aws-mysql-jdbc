@@ -37,7 +37,7 @@ import java.nio.file.Files
 val versionMajor = project.property("com.mysql.cj.build.driver.version.major")
 val versionMinor = project.property("com.mysql.cj.build.driver.version.minor")
 val versionSubminor = Integer.parseInt(project.property("com.mysql.cj.build.driver.version.subminor").toString()) + if (project.property("snapshot") == "true") 1 else 0
-version = "$versionMajor.$versionMinor.$versionSubminor" + if (project.property("snapshot") == "true") "-SNAPSHOT" else ""
+version = "$versionMajor.$versionMinor.$versionSubminor" + "-VCNC" + if (project.property("snapshot") == "true") "-SNAPSHOT" else ""
 // Shared Shading Values
 val shadingOriginPackage: String = "com.mysql"
 val shadingDestinationPackage: String = "software.aws.rds.jdbc.mysql.shading.com.mysql"
@@ -373,17 +373,11 @@ publishing {
 
     repositories {
         maven {
-            name = "OSSRH"
-
-            url = if(project.property("snapshot") == "true") {
-                uri("https://aws.oss.sonatype.org/content/repositories/snapshots/")
-            } else {
-                uri("https://aws.oss.sonatype.org/service/local/staging/deploy/maven2/")
-            }
+            url = uri("https://nexus.staging.tada.dev/repository/maven-releases/")
 
             credentials {
-                username = System.getenv("MAVEN_USERNAME")
-                password = System.getenv("MAVEN_PASSWORD")
+                username = "nexus_username"
+                password = "nexus_password"
             }
         }
 

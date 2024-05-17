@@ -1,8 +1,5 @@
 name: Aurora Performance CI
 
-on:
-  workflow_dispatch:
-
 concurrency:
   group: environment-perf-${{ github.ref }}
   cancel-in-progress: false

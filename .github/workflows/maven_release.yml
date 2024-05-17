@@ -1,10 +1,5 @@
 name: 'Release to Maven'
 
-on:
-  release:
-    types:
-      - published
-
 jobs:
   ubuntu-latest-aurora-release-to-maven:
     name: 'Build And Release to Maven'

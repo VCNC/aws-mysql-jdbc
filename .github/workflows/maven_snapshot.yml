@@ -1,11 +1,5 @@
 name: 'Snapshot to Maven'
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
 jobs:
   ubuntu-latest-aurora-snapshot-to-maven:
     name: 'Build And Upload Snapshot to Maven'

@@ -1,11 +1,5 @@
 name: Main CI
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-
 concurrency:
   group: environment-${{ github.ref }}
   cancel-in-progress: true

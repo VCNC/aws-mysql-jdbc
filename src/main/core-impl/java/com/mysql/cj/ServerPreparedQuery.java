@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2022, Oracle and/or its affiliates.
+ * Copyright (c) 2017, 2023, Oracle and/or its affiliates.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, version 2.0, as published by the
@@ -113,7 +113,6 @@ public class ServerPreparedQuery extends ClientPreparedQuery {
     }
 
     /**
-     * 
      * @param sql
      *            query string
      * @throws IOException
@@ -150,17 +149,19 @@ public class ServerPreparedQuery extends ClientPreparedQuery {
             boolean checkEOF = !this.session.getServerSession().isEOFDeprecated();
 
             if (this.parameterCount > 0) {
-                if (checkEOF) { // Skip the following EOF packet.
-                    this.session.getProtocol().skipPacket();
-                }
-
                 this.parameterFields = this.session.getProtocol().read(ColumnDefinition.class, new ColumnDefinitionFactory(this.parameterCount, null))
                         .getFields();
+                if (checkEOF && this.session.getProtocol().probeMessage(null).isEOFPacket()) { // Skip the following EOF packet.
+                    this.session.getProtocol().skipPacket();
+                }
             }
 
             // Read in the result set column information
             if (fieldCount > 0) {
                 this.resultFields = this.session.getProtocol().read(ColumnDefinition.class, new ColumnDefinitionFactory(fieldCount, null));
+                if (checkEOF && this.session.getProtocol().probeMessage(null).isEOFPacket()) { // Skip the following EOF packet.
+                    this.session.getProtocol().skipPacket();
+                }
             }
         }
     }
@@ -571,6 +572,8 @@ public class ServerPreparedQuery extends ClientPreparedQuery {
                 this.session.getProtocol().sendCommand(this.commandBuilder.buildComStmtReset(this.session.getSharedSendPacket(), this.serverStatementId), false,
                         0);
             } finally {
+                // OK_PACKET returned in previous sendCommand() was not processed so keep original transaction state.
+                this.session.getProtocol().getServerSession().preserveOldTransactionState();
                 this.session.clearInputStream();
             }
         }

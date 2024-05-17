@@ -1,6 +1,6 @@
 # Amazon Web Services (AWS) JDBC Driver for MySQL
 
-[![Build Status](https://github.com/awslabs/aws-mysql-jdbc/workflows/CI/badge.svg)](https://github.com/awslabs/aws-mysql-jdbc/actions?query=workflow%3A%22CI%22)
+[![Build Status](https://github.com/awslabs/aws-mysql-jdbc/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/awslabs/aws-mysql-jdbc/actions/workflows/main.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/software.aws.rds/aws-mysql-jdbc/badge.svg)](https://maven-badges.herokuapp.com/maven-central/software.aws.rds/aws-mysql-jdbc)
 [![Javadoc](https://javadoc.io/badge2/software.aws.rds/aws-mysql-jdbc/javadoc.svg)](https://javadoc.io/doc/software.aws.rds/aws-mysql-jdbc)
 [![License: GPLv2 with FOSS exception](https://img.shields.io/badge/license-GPLv2_with_FOSS_exception-c30014.svg)](LICENSE)
@@ -17,6 +17,15 @@ An Amazon Aurora DB cluster uses failover to automatically repairs the DB cluste
 
 Although Aurora is able to provide maximum availability through the use of failover, existing client drivers do not fully support this functionality. This is partially due to the time required for the DNS of the new primary DB instance to be fully resolved in order to properly direct the connection. The AWS JDBC Driver for MySQL fully utilizes failover behavior by maintaining a cache of the Aurora cluster topology and each DB instance's role (Aurora Replica or primary DB instance). This topology is provided via a direct query to the Aurora database, essentially providing a shortcut to bypass the delays caused by DNS resolution. With this knowledge, the AWS JDBC Driver can more closely monitor the Aurora DB cluster status so that a connection to the new primary DB instance can be established as fast as possible. Additionally, as noted above, the AWS JDBC Driver is designed to be a drop-in compatible for other MySQL JDBC drivers and can be used to interact with RDS and MySQL databases as well as Aurora MySQL.
 
+## Differences between the AWS MySQL JDBC driver and the AWS JDBC Driver
+The AWS JDBC Driver for MySQL is based on the open-sourced [MySQL Connector/J JDBC driver](https://github.com/mysql/mysql-connector-j) and allows users to take advantage of the features of Amazon Aurora databases. The AWS JDBC driver for MySQL can be used only with MySQL databases or MySQL-compatible Amazon RDS and Amazon Aurora clusters.
+
+The [AWS JDBC Driver](https://github.com/awslabs/aws-advanced-jdbc-wrapper) provides similar functionalities, but is not specific to a certain vendor database. This driver instead uses a feature layer for JDBC on top of an existing database driver that the user specifies. It was designed to work with multiple relational databases and also different drivers, whether they are community-based or proprietary drivers. The AWS JDBC Driver currently supports the MySQL and PostgreSQL databases.
+
+Once the AWS JDBC Driver was released, it was decided new features would not be added to the AWS JDBC Driver for MySQL and that future development would be taking place in the AWS JDBC Driver project. More details can be found in the [maintenance policy](https://github.com/awslabs/aws-mysql-jdbc/blob/main/RELEASE_POLICY.md#maintenance-policy). The AWS JDBC Driver for MySQL is now behind in terms of features and only receives security and critical fixes. The current maintenance window for the AWS JDBC Driver for MySQL ends on July 25, 2024, and it is recommended to migrate to the AWS JDBC Driver before that date. There is a [migration guide](https://github.com/awslabs/aws-advanced-jdbc-wrapper/blob/main/docs/using-the-jdbc-driver/UsingTheJdbcDriver.md#aws-jdbc-driver-for-mysql-migration-guide) available in the AWS JDBC Driver documentation to assist users through the migration process.
+
+For new users who are wondering which one driver to use, it is recommended to use the [AWS JDBC Driver](https://github.com/awslabs/aws-advanced-jdbc-wrapper).
+
 ## Getting Started
 
 ### Prerequisites
@@ -29,18 +38,18 @@ The AWS JDBC Driver for MySQL can be installed from pre-compiled packages that c
 
 **Example - Direct download with wget**
 ```bash
-wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.9/aws-mysql-jdbc-1.1.9.jar
-cp aws-mysql-jdbc-1.1.9.jar /home/userx/libs/
-export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.9.jar
+wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.14/aws-mysql-jdbc-1.1.14.jar
+cp aws-mysql-jdbc-1.1.14.jar /home/userx/libs/
+export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.14.jar
 ```
 
 **Upgrading to a newer version with wget**
 
-To upgrade the driver, replace the .jar file of your earlier driver with the new `.jar` file. After replacing the `.jar` file, update the CLASSPATH to include the name of the new file. For example, to upgrade to version 1.1.9:
+To upgrade the driver, replace the .jar file of your earlier driver with the new `.jar` file. After replacing the `.jar` file, update the CLASSPATH to include the name of the new file. For example, to upgrade to version 1.1.14:
 ```bash
-wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.9/aws-mysql-jdbc-1.1.9.jar
-cp aws-mysql-jdbc-1.1.9.jar /home/userx/libs/
-export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.9.jar
+wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.14/aws-mysql-jdbc-1.1.14.jar
+cp aws-mysql-jdbc-1.1.14.jar /home/userx/libs/
+export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.14.jar
 ```
 
 #### As a Maven dependency
@@ -52,20 +61,20 @@ You can use [Maven's dependency management](https://central.sonatype.com/search?
   <dependency>
     <groupId>software.aws.rds</groupId>
     <artifactId>aws-mysql-jdbc</artifactId>
-    <version>1.1.9</version>
+    <version>1.1.14</version>
   </dependency>
 </dependencies>
 ```
 
 **Upgrading to a newer version with Maven**
 
-To upgrade to a newer version of the driver, replace the version number identified in the `pom.xml` file with the newer driver version. For example, to upgrade to version 1.1.9, modify the file to include:
+To upgrade to a newer version of the driver, replace the version number identified in the `pom.xml` file with the newer driver version. For example, to upgrade to version 1.1.14, modify the file to include:
 ```xml
 <dependencies>
   <dependency>
     <groupId>software.aws.rds</groupId>
     <artifactId>aws-mysql-jdbc</artifactId>
-    <version>1.1.9</version>
+    <version>1.1.14</version>
   </dependency>
 </dependencies>
 ```
@@ -76,16 +85,16 @@ You can use [Gradle's dependency management](https://central.sonatype.com/search
 **Example - Gradle**
 ```gradle
 dependencies {
-    implementation group: 'software.aws.rds', name: 'aws-mysql-jdbc', version: '1.1.9'
+    implementation group: 'software.aws.rds', name: 'aws-mysql-jdbc', version: '1.1.14'
 }
 ```
 
 **Upgrading to a newer version with Gradle**
 
-To upgrade to a newer version of the driver, replace the version number identified in the application's ```build.gradle``` file with the newer driver version. For example, to upgrade to version 1.1.9:
+To upgrade to a newer version of the driver, replace the version number identified in the application's ```build.gradle``` file with the newer driver version. For example, to upgrade to version 1.1.14:
 ```gradle
 dependencies {
-    implementation group: 'software.aws.rds', name: 'aws-mysql-jdbc', version: '1.1.9'
+    implementation group: 'software.aws.rds', name: 'aws-mysql-jdbc', version: '1.1.14'
 }
 ```
 
@@ -95,9 +104,9 @@ To use the driver with an IDE (for example, IntelliJ), download the `.jar` file 
 **Example - IntelliJ**
 
 ```bash
-wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.9/aws-mysql-jdbc-1.1.9.jar
-cp aws-mysql-jdbc-1.1.9.jar /home/userx/libs/
-export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.9.jar
+wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.14/aws-mysql-jdbc-1.1.14.jar
+cp aws-mysql-jdbc-1.1.14.jar /home/userx/libs/
+export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.14.jar
 ```
 
 After downloading the `.jar` file and updating the CLASSPATH, add the driver information to your `Project`:
@@ -117,9 +126,9 @@ After downloading the `.jar` file and updating the CLASSPATH, add the driver inf
 To upgrade to a newer version of the driver, download the updated driver, and add it to your CLASSPATH:  
 
 ```bash
-wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.9/aws-mysql-jdbc-1.1.9.jar
-cp aws-mysql-jdbc-1.1.9.jar /home/userx/libs/
-export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.9.jar
+wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.14/aws-mysql-jdbc-1.1.14.jar
+cp aws-mysql-jdbc-1.1.14.jar /home/userx/libs/
+export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.14.jar
 ```
 
 Then, follow the steps listed above to update your project to the latest version.
@@ -131,9 +140,9 @@ To use the driver with the DBeaver database client, download the `.jar` file, co
 **Example - DBeaver**
 
 ```bash
-wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.9/aws-mysql-jdbc-1.1.9.jar
-cp aws-mysql-jdbc-1.1.9.jar /home/userx/libs/
-export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.9.jar
+wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1.14/aws-mysql-jdbc-1.1.14.jar
+cp aws-mysql-jdbc-1.1.14.jar /home/userx/libs/
+export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.14.jar
 ```
 
 After downloading the .jar file and adding it to your CLASSPATH, add the driver information to the DBeaver client:
@@ -176,9 +185,9 @@ After adding driver information, you can create new connections that use the AWS
 To upgrade to a newer version of the driver, download the updated driver, and add it to your CLASSPATH:  
 
 ```bash
-wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1./aws-mysql-jdbc-1.1.9.jar
-cp aws-mysql-jdbc-1.1.9.jar /home/userx/libs/
-export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.9.jar
+wget https://github.com/awslabs/aws-mysql-jdbc/releases/download/1.1./aws-mysql-jdbc-1.1.14.jar
+cp aws-mysql-jdbc-1.1.14.jar /home/userx/libs/
+export CLASSPATH=$CLASSPATH:/home/userx/libs/aws-mysql-jdbc-1.1.14.jar
 ```
 Then, follow the steps listed above to update your DBeaver client settings.
 
@@ -191,7 +200,7 @@ If there is an unreleased feature you would like to try, it may be available in 
   <dependency>
     <groupId>software.aws.rds</groupId>
     <artifactId>aws-mysql-jdbc</artifactId>
-    <version>1.1.9</version>
+    <version>1.1.15</version>
     <scope>system</scope>
     <systemPath>path-to-snapshot-jar</systemPath>
   </dependency>
@@ -219,16 +228,16 @@ There are many different types of URLs that can connect to an Aurora DB cluster;
 Note: The connection string follows standard URL parameters. In order to add parameters to the connection string, simply add `?` and then the `parameter_name=value` pair at the end of the connection string. You may add multiple parameters by separating the parameter name and value set (`parameter_name=value`) with the `&` symbol. For example, to add 2 parameters simply add `?param_name=value&param_2=value2` at the end of the connection string.
  
 
-| URL Type                                      | Example                                                                              |     Required Parameters      | Driver Behavior                                                                                                                                                                                      |
-|-----------------------------------------------|--------------------------------------------------------------------------------------|:----------------------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Cluster Endpoint                              | `jdbc:mysql:aws://db-identifier.cluster-XYZ.us-east-2.rds.amazonaws.com:3306`        |             None             | *Initial connection:* primary DB instance<br/>*Failover behavior:* connect to the new primary DB instance                                                                                            |
-| Read-Only Cluster Endpoint                    | `jdbc:mysql:aws://db-identifier.cluster-ro-XYZ.us-east-2.rds.amazonaws.com:3306`     |             None             | *Initial connection:* any Aurora Replica<br/>*Failover behavior:* prioritize connecting to any active Aurora Replica but might connect to the primary DB instance if it provides a faster connection |
-| Instance Endpoint                             | `jdbc:mysql:aws://instance-1.XYZ.us-east-2.rds.amazonaws.com:3306`                   |             None             | *Initial connection:* the instance specified (DB instance 1)<br/>*Failover behavior:* connect to the primary DB instance                                                                             |
-| RDS Custom Cluster                            | `jdbc:mysql:aws://db-identifier.cluster-custom-XYZ.us-east-2.rds.amazonaws.com:3306` |             None             | The driver does not support custom clusters yet. *Initial connection:* the primary instance in the cluster<br/>*Failover behavior:* connect to the primary DB instance                               |
-| IP Address                                    | `jdbc:mysql:aws://10.10.10.10:3306`                                                  | `clusterInstanceHostPattern` | *Initial connection:* the DB instance specified<br/>*Failover behavior:* connect to the primary DB instance                                                                                          |
-| Custom Domain                                 | `jdbc:mysql:aws://my-custom-domain.com:3306`                                         | `clusterInstanceHostPattern` | *Initial connection:* the DB instance specified<br/>*Failover behavior:* connect to the primary DB instance                                                                                          |
-| Non-Aurora Endpoint                           | `jdbc:mysql:aws://localhost:3306`                                                    |             None             | A regular JDBC connection will be returned - no failover functionality                                                                                                                               |
-| Aurora Endpoint<br/>(through a custom tunnel) | `jdbc:mysql:aws://localhost:3306`                                                    | `clusterInstanceHostPattern` | *Initial connection:* the DB instance specified<br/>*Failover behavior:* connect to the primary DB instance                                                                                          |
+| URL Type                                      | Example                                                                              |     Required Parameters      | Driver Behavior                                                                                                                                                                                     |
+|-----------------------------------------------|--------------------------------------------------------------------------------------|:----------------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Cluster Endpoint                              | `jdbc:mysql:aws://db-identifier.cluster-XYZ.us-east-2.rds.amazonaws.com:3306`        |             None             | *Initial connection:* primary DB instance<br/>*Failover behavior:* connect to the new primary DB instance                                                                                           |
+| Read-Only Cluster Endpoint                    | `jdbc:mysql:aws://db-identifier.cluster-ro-XYZ.us-east-2.rds.amazonaws.com:3306`     |             None             | *Initial connection:* any Aurora Replica<br/>*Failover behavior:* prioritize connecting to any active Aurora Replica but might connect to the primary DB instance if it provides a connection first |
+| Instance Endpoint                             | `jdbc:mysql:aws://instance-1.XYZ.us-east-2.rds.amazonaws.com:3306`                   |             None             | *Initial connection:* the instance specified (DB instance 1)<br/>*Failover behavior:* connect to the primary DB instance                                                                            |
+| RDS Custom Cluster                            | `jdbc:mysql:aws://db-identifier.cluster-custom-XYZ.us-east-2.rds.amazonaws.com:3306` |             None             | The driver does not support custom clusters yet. *Initial connection:* the primary instance in the cluster<br/>*Failover behavior:* connect to the primary DB instance                              |
+| IP Address                                    | `jdbc:mysql:aws://10.10.10.10:3306`                                                  | `clusterInstanceHostPattern` | *Initial connection:* the DB instance specified<br/>*Failover behavior:* connect to the primary DB instance                                                                                         |
+| Custom Domain                                 | `jdbc:mysql:aws://my-custom-domain.com:3306`                                         | `clusterInstanceHostPattern` | *Initial connection:* the DB instance specified<br/>*Failover behavior:* connect to the primary DB instance                                                                                         |
+| Non-Aurora Endpoint                           | `jdbc:mysql:aws://localhost:3306`                                                    |             None             | A regular JDBC connection will be returned - no failover functionality                                                                                                                              |
+| Aurora Endpoint<br/>(through a custom tunnel) | `jdbc:mysql:aws://localhost:3306`                                                    | `clusterInstanceHostPattern` | *Initial connection:* the DB instance specified<br/>*Failover behavior:* connect to the primary DB instance                                                                                         |
 
 Information about the `clusterInstanceHostPattern` parameter is provided in the section below.
 
@@ -304,6 +313,7 @@ In addition to [the parameters that you can configure for the MySQL Connector/J 
 | `gatherMetricsPerInstance`             | Boolean |                                                    No                                                     | Set to true to gather additional performance metrics per instance as well as cluster. Set to false to only gather performance metrics per cluster. <br><br>To print collected metrics at instance level, call `IClusterAwareMetricsReporter.reportMetrics(String connUrl, Log log, true)`.                                                                                                                                                                                                                                                                                                                                                                                                                                       | `false`                                                                                                                                                                                        | 
 | `allowXmlUnsafeExternalEntity`         | Boolean |                                                    No                                                     | Set to true if you would like to use XML inputs that refer to external entities. WARNING: Setting this to true is unsafe since your system to be prone to XXE attacks.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | `false`                                                                                                                                                                                        |
 | `keepSessionStateOnFailover`           | Boolean |                                                    No                                                     | This parameter will allow connections to retain the session state after failover. When `keepSessionStateOnFailover` is set to false, connections will need to be reconfigured as seen in the examples [here](#08007---Transaction-Resolution-Unknown). When this parameter is true, the `autocommit`, `sessionMaxRows` and `transactionIsolation` values will be kept. This parameter is only necessary when the session state must be retained and the connection cannot be manually reconfigured by the user. <br><br> **Please note:** this parameter will not be able to fully restore the connection session state, as it will only save the `autocommit`, `sessionMaxRows` and `transactionIsolation` values.              | `false`                                                                                                                                                                                        |
+| `enableFailoverStrictReader`           | Boolean |                                                    No                                                     | Set to true to only allow failover to reader nodes during the reader failover process. If enabled, reader failover to a writer node will only be allowed for single-node clusters. This logic mimics the logic of the Aurora read-only cluster endpoint.                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | `false`                                                                                                                                                                                        |
 
 ### Failover Exception Codes
 #### 08001 - Unable to Establish SQL Connection
@@ -528,6 +538,26 @@ You can include additional monitoring configurations by adding the prefix `monit
 > 
 > It is suggested to turn off Enhanced Failure Monitoring plugin, or to avoid using RDS Proxy endpoints when the plugin is active. 
 
+## **Experimental** Enhanced Failure Monitoring Plugin v2
+
+> [!WARNING] 
+> This plugin is experimental and users should test the plugin before using it in production environment.
+
+Enhanced Failure Monitoring Plugin v2 is an alternative implementation of enhanced failure monitoring, and it is functionally equal to the Enhanced Failure Monitoring Plugin described above. Both plugins share the same set of [configuration parameters](#enhanced-failure-monitoring-parameters). Enhanced Failure Monitoring Plugin v2 plugin is designed to be a drop-in replacement for the Enhanced Failure Monitoring Plugin.
+
+> [!NOTE] 
+> Since these two plugins are separate plugins, users may decide to use them together with a single connection. While this should not  have any negative side effects, it is not recommended. It is recommended to use either the Enhanced Failure Monitoring Plugin, or the Enhanced Failure Monitoring Plugin v2 where it's needed.
+
+In order to use Enhanced Failure Monitoring Plugin v2, users should add `software.aws.rds.jdbc.mysql.shading.com.mysql.cj.jdbc.ha.plugins.efm2.NodeMonitoringConnectionPluginFactory` to `connectionPluginFactories`.
+
+Enhanced Failure Monitoring Plugin v2 is designed to address [some of the issues](https://github.com/awslabs/aws-mysql-jdbc/issues/412) that have been reported by multiple users. The following changes have been made:
+- Used weak pointers to ease garbage collection
+- Split monitoring logic into two separate threads to increase overall monitoring stability
+- Reviewed locks for monitoring context
+- Reviewed and redesigned stopping of idle monitoring threads
+- Reviewed and simplified monitoring logic
+
+
 ## AWS Secrets Manager Plugin
 
 The AWS JDBC Driver for MySQL supports usage of database credentials stored in the [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) through the AWS Secrets Manager Plugin. This plugin is optional and can be enabled with the `connectionPluginFactories` parameter as seen in the [connection plugin manager parameters table](#connection-plugin-manager-parameters). When a user creates a new connection with this plugin enabled, the plugin will retrieve the secret and the connection will be created using those credentials.
@@ -573,6 +603,12 @@ public class AWSSecretsManagerPluginSample {
    }
 }
 ```
+
+## Reader Cluster Connection Plugin
+
+When connecting to an Amazon Aurora database using the reader endpoint, the endpoint will load balance connections between all the available Aurora Replicas. In situations where the AWS JDBC Driver for MySQL needs to create a new connection internally, the new connection may or may not be to the same instance the original connection was made to. This means any processes that require the same instance will result in errors. For example, setting query timeouts may result in errors due to the kill query being sent to the incorrect instance. In these cases, the Reader Cluster Connection Plugin can be used to ensure all new connections are made to the same reader.
+
+The Reader Cluster Connection Plugin is not enabled by default and can be enabled by using the [`connectionPluginFactories`](#connection-plugin-manager-parameters).
 
 ## Extra Additions
 
@@ -709,11 +745,16 @@ For more information on the configuration parameter, see [Debugging/Profiling](h
 The driver currently does not support custom logging outside the usual logging frameworks like SLF4J. For more information on using SLF4J with the driver see [here](https://dev.mysql.com/doc/connector-j/5.1/en/connector-j-logging-slf4j.html).
 
 ## Known Limitations
+Please note that as mentioned in the [maintenance policy](./RELEASE_POLICY.md), there will not be any new feature work for the AWS JDBC Driver for MySQL. All new feature development will be targeted towards the [AWS JDBC Driver](https://github.com/awslabs/aws-advanced-jdbc-wrapper), which can be used in place of the AWS JDBC Driver for MySQL. A migration guide containing instructions on how to transition from the AWS JDBC Driver for MySQL to the AWS JDBC Driver can be found [here](https://github.com/awslabs/aws-advanced-jdbc-wrapper/blob/main/docs/using-the-jdbc-driver/UsingTheJdbcDriver.md#aws-jdbc-driver-for-mysql-migration-guide). We encourage you to check out the AWS JDBC Driver [documentation](https://github.com/awslabs/aws-advanced-jdbc-wrapper/blob/main/docs/Documentation.md) and to consider whether it would be suitable for your needs. 
+
 ### Amazon RDS Blue/Green Deployments
 
-This driver currently does not support Amazon RDS Blue/Green Deployments and should be avoided. Executing a Blue/Green deployment with the driver will disconnect the driver from the database, and it will be unable to re-establish a connection to an available database instance.
+This driver does not support Amazon RDS Blue/Green Deployments, and they should be avoided. Executing a Blue/Green deployment with the driver will disconnect the driver from the database, and it will be unable to re-establish a connection to an available database instance.
 
-## Known Issues
+### Amazon Aurora Global Databases
+
+This driver does not support Amazon Aurora Global Databases. While it is possible to connect to global databases, failing over to a secondary cluster will result in errors and there may be additional unforeseen errors when working with global databases.
+
 ### SSLHandshakeException
 Using the driver with JDKs based on OpenJDK 8u292+ or OpenJDK 11.0.11+ will result in an exception: `SSLHandshakeException: No appropriate protocol`.
 This is due to OpenJDK disabling TLS 1.0 and 1.1 availability in `security.properties`. For additional information see "[Disable TLS 1.0 and TLS 1.1](https://java.com/en/configure_crypto.html#DisableTLS)".
@@ -808,7 +849,6 @@ public class AWSSecretsManagerPluginSample2 {
 
 ```
 
-
 ## Getting Help and Opening Issues
 
 If you encounter a bug with the AWS JDBC Driver for MySQL, we would like to hear about it. Please search the [existing issues](https://github.com/awslabs/aws-mysql-jdbc/issues) and see if others are also experiencing the issue before opening a new issue. When opening a new issue, we will need the version of AWS JDBC Driver for MySQL, Java language version, OS you’re using, and the MySQL database version you're running against. Please include a reproduction case for the issue when appropriate.
@@ -817,7 +857,7 @@ The GitHub issues are intended for bug reports and feature requests. Keeping the
 
 ## Releases
 
-The AWS JDBC Driver for MySQL has a regular monthly release cadence. A new release will occur during the last week of each month. However, if there are no changes since the latest release, then a release will not occur.
+The AWS JDBC Driver for MySQL has a regular monthly release cadence. A new release will occur during the last week of each month. However, if there are no changes since the latest release, then a release will not occur. The full release schedule and maintenance policy can be found [here](./RELEASE_POLICY.md).
 
 ## Aurora Engine Version Testing
 The `aws-mysql-jdbc` driver is being tested against the following Community and Aurora database versions in our test suite:

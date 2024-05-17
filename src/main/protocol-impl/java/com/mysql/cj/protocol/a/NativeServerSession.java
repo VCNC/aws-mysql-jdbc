@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2021, Oracle and/or its affiliates.
+ * Copyright (c) 2015, 2023, Oracle and/or its affiliates.
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, version 2.0, as published by the
@@ -131,20 +131,12 @@ public class NativeServerSession implements ServerSession {
 
     @Override
     public void setStatusFlags(int statusFlags, boolean saveOldStatus) {
-        if (saveOldStatus) {
-            this.oldStatusFlags = this.statusFlags;
-        }
+        int currentStatusFlags = this.statusFlags;
         this.statusFlags = statusFlags;
-    }
-
-    @Override
-    public int getOldStatusFlags() {
-        return this.oldStatusFlags;
-    }
-
-    @Override
-    public void setOldStatusFlags(int oldStatusFlags) {
-        this.oldStatusFlags = oldStatusFlags;
+        if (saveOldStatus) {
+            this.oldStatusFlags = currentStatusFlags;
+            preserveOldTransactionState();
+        }
     }
 
     @Override
@@ -244,7 +236,7 @@ public class NativeServerSession implements ServerSession {
     @Override
     public int getServerVariable(String variableName, int fallbackValue) {
         try {
-            return Integer.valueOf(getServerVariable(variableName));
+            return Integer.parseInt(getServerVariable(variableName));
         } catch (NumberFormatException nfe) {
             //getLog().logWarn(
             //        Messages.getString("Connection.BadValueInServerVariables", new Object[] { variableName, getServerVariable(variableName), fallbackValue }));

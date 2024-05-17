@@ -32,10 +32,13 @@
 package testsuite.integration.container;
 
 import com.mysql.cj.conf.PropertyKey;
+import com.mysql.cj.jdbc.exceptions.MySQLTimeoutException;
+import com.mysql.cj.jdbc.ha.plugins.ReaderClusterConnectionPluginFactory;
 import com.mysql.cj.jdbc.ha.plugins.failover.IClusterAwareMetricsReporter;
+import java.sql.Statement;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -607,4 +610,46 @@ public class AuroraMysqlIntegrationTest extends AuroraMysqlIntegrationBaseTest {
     conn.close();
   }
 
+  @RepeatedTest(50)
+  public void test_QueryTimeoutOnReaderClusterConnection() throws Exception {
+    final Properties props = initDefaultProps();
+    props.setProperty("connectionPluginFactories", ReaderClusterConnectionPluginFactory.class.getName());
+    try (final Connection conn = connectToInstance(MYSQL_RO_CLUSTER_URL, MYSQL_PORT, props)) {
+      assertTrue(conn.isValid(5));
+      try (final Statement statement = conn.createStatement()) {
+        statement.setQueryTimeout(1);
+        statement.execute("SELECT SLEEP(60)");
+      } catch (MySQLTimeoutException e) {
+        // ignore
+      }
+    }
+  }
+
+  @Test
+  public void test_CancelStatementsAreNotBlocked() {
+    try (final Connection conn = connectToInstance(MYSQL_CLUSTER_URL, MYSQL_PORT)) {
+      Statement stmt = conn.createStatement();
+      Thread thread = new Thread(() -> {
+        try {
+          Thread.sleep(1000);
+          stmt.cancel();
+        } catch (SQLException | InterruptedException e) {
+          fail(e);
+        }
+      });
+
+      final long startTime = System.currentTimeMillis();
+      thread.start();
+      stmt.execute("select sleep(100000000)");
+
+      try {
+        thread.join();
+        assert(System.currentTimeMillis() - startTime < 10000);
+      } catch (InterruptedException e) {
+        fail(e);
+      }
+    } catch (Exception e) {
+      fail(e);
+    }
+  }
 }

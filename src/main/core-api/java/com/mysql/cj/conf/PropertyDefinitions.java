@@ -210,8 +210,11 @@ public class PropertyDefinitions {
                 new StringPropertyDefinition(PropertyKey.ociConfigFile, DEFAULT_VALUE_NULL_STRING, RUNTIME_MODIFIABLE,
                         Messages.getString("ConnectionProperties.ociConfigFile"), "8.0.27", CATEGORY_AUTH, Integer.MIN_VALUE + 7),
 
+                new StringPropertyDefinition(PropertyKey.ociConfigProfile, "DEFAULT", RUNTIME_MODIFIABLE,
+                        Messages.getString("ConnectionProperties.ociConfigProfile"), "8.0.33", CATEGORY_AUTH, Integer.MIN_VALUE + 8),
+
                 new StringPropertyDefinition(PropertyKey.authenticationFidoCallbackHandler, DEFAULT_VALUE_NULL_STRING, RUNTIME_MODIFIABLE,
-                        Messages.getString("ConnectionProperties.authenticationFidoCallbackHandler"), "8.0.29", CATEGORY_AUTH, Integer.MIN_VALUE + 8),
+                        Messages.getString("ConnectionProperties.authenticationFidoCallbackHandler"), "8.0.29", CATEGORY_AUTH, Integer.MIN_VALUE + 9),
 
                 //
                 // CATEGORY_CONNECTION
@@ -716,7 +719,7 @@ public class PropertyDefinitions {
                         Messages.getString("ConnectionProperties.failureDetectionCount"), "0.4.0", CATEGORY_HA, Integer.MAX_VALUE, 0,
                         Integer.MAX_VALUE),
 
-                new IntegerPropertyDefinition(PropertyKey.monitorDisposalTime, 60_000, RUNTIME_MODIFIABLE,
+                new IntegerPropertyDefinition(PropertyKey.monitorDisposalTime, 900_000, RUNTIME_MODIFIABLE, // 15 min
                     Messages.getString("ConnectionProperties.monitorDisposalTime"), "0.4.0", CATEGORY_HA, Integer.MAX_VALUE, 0,
                     Integer.MAX_VALUE),
 

@@ -49,10 +49,10 @@ plugins {
     `maven-publish`
     signing
     // Release
-    id("com.github.vlsi.crlf") version "1.86"
-    id("com.github.vlsi.gradle-extensions") version "1.86"
-    id("com.github.vlsi.license-gather") version "1.87" apply false
-    id("com.github.vlsi.stage-vote-release") version "1.88"
+    id("com.github.vlsi.crlf") version "1.90"
+    id("com.github.vlsi.gradle-extensions") version "1.90"
+    id("com.github.vlsi.license-gather") version "1.90" apply false
+    id("com.github.vlsi.stage-vote-release") version "1.90"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -136,7 +136,7 @@ tasks.shadowJar {
     exclude("instrumentation/**")
     exclude("demo/**")
     exclude("documentation/**")
-    exclude("customplugins/**");
+    exclude("customplugins/**")
 
     includeEmptyDirs = false
 }
@@ -260,32 +260,32 @@ tasks.withType<Checkstyle>().configureEach {
 
 dependencies {
     testImplementation("org.apache.commons:commons-dbcp2:2.9.0")
-    testImplementation("software.amazon.awssdk:rds:2.17.191")
-    testImplementation("software.amazon.awssdk:ec2:2.17.191")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
-    testImplementation("org.junit.platform:junit-platform-commons:1.9.1")
-    testImplementation("org.junit.platform:junit-platform-engine:1.9.1")
+    testImplementation("software.amazon.awssdk:rds:2.25.1")
+    testImplementation("software.amazon.awssdk:ec2:2.25.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")
+    testImplementation("org.junit.platform:junit-platform-commons:1.10.0")
+    testImplementation("org.junit.platform:junit-platform-engine:1.10.0")
     testImplementation("org.junit.platform:junit-platform-launcher:1.9.1")
     testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.1")
     testImplementation("org.mockito:mockito-inline:4.8.0")
     testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation("org.testcontainers:testcontainers:1.18.3")
-    testImplementation("org.testcontainers:mysql:1.18.3")
+    testImplementation("org.testcontainers:mysql:1.19.1")
     testImplementation("org.testcontainers:junit-jupiter:1.18.3")
     testImplementation("org.testcontainers:toxiproxy:1.18.3")
     testImplementation("org.apache.poi:poi-ooxml:5.2.3")
     testImplementation("com.zaxxer:HikariCP:4.0.3")
-    testImplementation("software.amazon.awssdk:secretsmanager:2.17.191")
+    testImplementation("software.amazon.awssdk:secretsmanager:2.23.12")
 
-    implementation("software.amazon.awssdk:rds:2.17.191")
-    implementation("com.google.protobuf:protobuf-java:3.19.1")
+    implementation("software.amazon.awssdk:rds:2.25.1")
+    implementation("com.google.protobuf:protobuf-java:3.21.9")
     implementation("com.mchange:c3p0:0.9.5.5")
     implementation("org.javassist:javassist:3.28.0-GA")
     implementation("org.slf4j:slf4j-api:2.0.1")
-    implementation("com.oracle.oci.sdk:oci-java-sdk-common:2.13.0")
-    compileOnly("software.amazon.awssdk:secretsmanager:2.17.191")
+    implementation("com.oracle.oci.sdk:oci-java-sdk-common:2.47.0")
+    compileOnly("software.amazon.awssdk:secretsmanager:2.23.12")
 
     compileOnly("org.ajoberstar.grgit:grgit-gradle:4.1.1")
 }
@@ -441,7 +441,10 @@ tasks.register<Test>("in-container-aurora") {
 }
 
 tasks.register<Test>("in-container-aurora-performance") {
-    filter.includeTestsMatching("testsuite.integration.container.AuroraMysqlPerformanceIntegrationTest")
+    filter.includeTestsMatching(
+        "testsuite.integration.container.AuroraMysqlPerformanceIntegrationTest")
+    filter.includeTestsMatching(
+        "testsuite.integration.container.AuroraMysqlPerformanceForEfm2IntegrationTest")
 }
 
 // Run all tests excluding integration tests

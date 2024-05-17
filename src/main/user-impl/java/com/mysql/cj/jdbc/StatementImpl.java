@@ -25,6 +25,8 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
+ *
+ * Modifications Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  */
 
 package com.mysql.cj.jdbc;
@@ -362,7 +364,7 @@ public class StatementImpl implements JdbcStatement {
      */
     protected boolean isNonResultSetProducingQuery(String sql) {
         QueryReturnType queryReturnType = QueryInfo.getQueryReturnType(sql, this.session.getServerSession().isNoBackslashEscapesSet());
-        return queryReturnType == QueryReturnType.DOES_NOT_PRODUCE_RESULT_SET || queryReturnType == QueryReturnType.MAY_PRODUCE_RESULT_SET;
+        return queryReturnType == QueryReturnType.DOES_NOT_PRODUCE_RESULT_SET || queryReturnType == QueryReturnType.MAY_PRODUCE_RESULT_SET || queryReturnType == QueryReturnType.NONE;
     }
 
     /**
@@ -1053,7 +1055,9 @@ public class StatementImpl implements JdbcStatement {
 
     protected int processMultiCountsAndKeys(StatementImpl batchedStatement, int updateCountCounter, long[] updateCounts) throws SQLException {
         synchronized (checkClosed().getConnectionMutex()) {
-            updateCounts[updateCountCounter++] = batchedStatement.getLargeUpdateCount();
+            if (batchedStatement.getLargeUpdateCount() != -1) {
+                updateCounts[updateCountCounter++] = batchedStatement.getLargeUpdateCount();
+            }
 
             boolean doGenKeys = this.batchedGeneratedKeys != null;
 
@@ -1319,6 +1323,7 @@ public class StatementImpl implements JdbcStatement {
 
                 if (!isBatch) {
                     this.query.getStatementExecuting().set(false);
+                    this.batchedGeneratedKeys = null;
                 }
             }
 

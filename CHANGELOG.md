@@ -3,23 +3,55 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/#semantic-versioning-200).
 
-## [1.1.9] - 2023-07-31
+## [1.1.14] - 2024-03-04
 ### Added
-- Documentation:
-  - An example of how to enable logging ([PR #431](https://github.com/awslabs/aws-mysql-jdbc/pull/431)).
-  - Release policy ([PR #434](https://github.com/awslabs/aws-mysql-jdbc/pull/434)).
-- The `keepSessionStateOnFailover` failover property to allow retaining the connection session state after failover without manually reconfiguring a connection ([Issue #425](https://github.com/awslabs/aws-mysql-jdbc/issues/425)).
+* Documentation regarding the differences between the AWS JDBC Driver and the AWS JDBC Driver for MySQL ([PR #554](https://github.com/awslabs/aws-mysql-jdbc/pull/554)).
+* Support for China endpoint patterns ([PR #543](https://github.com/awslabs/aws-mysql-jdbc/pull/543)).
 
 ### Fixed
-- Avoid updating topology during global transactions which caused JTA transactions to fail ([Issue #292](https://github.com/awslabs/aws-mysql-jdbc/issues/292)).
-- Keep `currentHostIndex` and hosts list in sync and pick a new connection when host role changes ([Issue #303](https://github.com/awslabs/aws-mysql-jdbc/issues/303)).
-- Redundant reset statement called due to incorrect condition ([Issue #422](https://github.com/awslabs/aws-mysql-jdbc/pull/435)).
+* Statement cancel waits for statement to finish before cancelling ([Issue #527](https://github.com/awslabs/aws-mysql-jdbc/issues/527)).
+
+## [1.1.13] - 2024-01-19
+### Changed
+* Upstream changes from MySQL 8.0.32 and 8.0.33 community driver. The upstream 8.0.33 changes include a security fix for [CVE-2023-21971 - RCE and Unauthorized DB Access](https://github.com/awslabs/aws-mysql-jdbc/security/advisories/GHSA-vj9v-mpjv-qf74).
+
+## [1.1.12] - 2023-12-21
+### Added
+* [**Experimental** Enhanced Host Monitoring Plugin v2](https://github.com/awslabs/aws-mysql-jdbc/blob/main/README.md#experimental-enhanced-failure-monitoring-plugin-v2), which is a redesign of the original Enhanced Host Monitoring Plugin and addresses memory leaks and high CPU usage during monitoring sessions ([PR #513](https://github.com/awslabs/aws-mysql-jdbc/pull/513)).
+
+## [1.1.11] - 2023-11-02
+### Added
+* Documentation regarding known limitations with Amazon Aurora Global Databases ([PR #482](https://github.com/awslabs/aws-mysql-jdbc/pull/482)).
+
+### Fixed
+* Batch execute with in-line comments resulting in unexpected errors ([Issue #464](https://github.com/awslabs/aws-mysql-jdbc/issues/464)).
+* Setting query timeouts while connecting to reader cluster endpoints resulting in errors ([PR #474](https://github.com/awslabs/aws-mysql-jdbc/pull/474)).
+* Incorrectly generated keys after executing batch and individual statements ([Issue #484](https://github.com/awslabs/aws-mysql-jdbc/issues/484)).
+
+## [1.1.10] - 2023-10-04
+### Added
+* Documentation regarding the `enableFailoverStrictReader` parameter ([Issue #456](https://github.com/awslabs/aws-mysql-jdbc/issues/456).
+
+### Fixed
+* Incorrect BatchUpdateException.getUpdateCounts() on failed batch statement execution ([Issue #450](https://github.com/awslabs/aws-mysql-jdbc/issues/450)).
+
+## [1.1.9] - 2023-07-31
+### Added
+* Documentation:
+  * An example of how to enable logging ([PR #431](https://github.com/awslabs/aws-mysql-jdbc/pull/431)).
+  * Release policy ([PR #434](https://github.com/awslabs/aws-mysql-jdbc/pull/434)).
+* The `keepSessionStateOnFailover` failover property to allow retaining the connection session state after failover without manually reconfiguring a connection ([Issue #425](https://github.com/awslabs/aws-mysql-jdbc/issues/425)).
+
+### Fixed
+* Avoid updating topology during global transactions which caused JTA transactions to fail ([Issue #292](https://github.com/awslabs/aws-mysql-jdbc/issues/292)).
+* Keep `currentHostIndex` and hosts list in sync and pick a new connection when host role changes ([Issue #303](https://github.com/awslabs/aws-mysql-jdbc/issues/303)).
+* Redundant reset statement called due to incorrect condition ([Issue #422](https://github.com/awslabs/aws-mysql-jdbc/pull/435)).
 
 ## [1.1.8] - 2023-06-28
 ### Fixed
-- The topology service cache no longer stores connection specific properties so connections to the same cluster will not connect with the wrong properties ([Issue #407](https://github.com/awslabs/aws-mysql-jdbc/issues/407)).
-- Fixed value `convertToNull` being rejected for property `zeroDateTimeBehavior` because of capitalization ([Issue #411](https://github.com/awslabs/aws-mysql-jdbc/pull/413)).
-- Handle case in the `FailoverConnectionPlugin` where the `currentHostIndex` is equal to `NO_CONNECTION_INDEX` ([Issue #417](https://github.com/awslabs/aws-mysql-jdbc/issues/417)).
+* The topology service cache no longer stores connection specific properties so connections to the same cluster will not connect with the wrong properties ([Issue #407](https://github.com/awslabs/aws-mysql-jdbc/issues/407)).
+* Fixed value `convertToNull` being rejected for property `zeroDateTimeBehavior` because of capitalization ([Issue #411](https://github.com/awslabs/aws-mysql-jdbc/pull/413)).
+* Handle case in the `FailoverConnectionPlugin` where the `currentHostIndex` is equal to `NO_CONNECTION_INDEX` ([Issue #417](https://github.com/awslabs/aws-mysql-jdbc/issues/417)).
 
 ## [1.1.7] - 2023-05-11
 ### Changed
@@ -167,6 +199,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 * This driver is based on the MySQL 8.0.21 community driver. The driver is cluster aware for Amazon Aurora MySQL. It takes advantage of Amazon Aurora's fast failover capabilities, reducing failover times from minutes to seconds.
 
+[1.1.14]: https://github.com/awslabs/aws-mysql-jdbc/compare/1.1.13...1.1.14
+[1.1.13]: https://github.com/awslabs/aws-mysql-jdbc/compare/1.1.12...1.1.13
+[1.1.12]: https://github.com/awslabs/aws-mysql-jdbc/compare/1.1.11...1.1.12
+[1.1.11]: https://github.com/awslabs/aws-mysql-jdbc/compare/1.1.10...1.1.11
+[1.1.10]: https://github.com/awslabs/aws-mysql-jdbc/compare/1.1.9...1.1.10
 [1.1.9]: https://github.com/awslabs/aws-mysql-jdbc/compare/1.1.8...1.1.9
 [1.1.8]: https://github.com/awslabs/aws-mysql-jdbc/compare/1.1.7...1.1.8
 [1.1.7]: https://github.com/awslabs/aws-mysql-jdbc/compare/1.1.6...1.1.7
